@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import abc
 import random
-from typing import Any, Awaitable, Callable, Iterable
+from collections.abc import Awaitable, Callable, Iterable
+from typing import Any
 from warnings import warn
 
 from aiohttp import ClientResponse

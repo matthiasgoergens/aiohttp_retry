@@ -2,17 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import sys
 from abc import abstractmethod
+from collections.abc import Awaitable, Callable, Generator
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Awaitable,
-    Callable,
-    Generator,
-    List,
-    Tuple,
+    Protocol,
     Union,
 )
 
@@ -26,11 +22,6 @@ _MIN_SERVER_ERROR_STATUS = 500
 
 if TYPE_CHECKING:
     from types import TracebackType
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
 
 
 class _Logger(Protocol):
@@ -51,7 +42,7 @@ class _Logger(Protocol):
 
 # url itself or list of urls for changing between retries
 _RAW_URL_TYPE = Union[StrOrURL, YARL_URL]
-_URL_TYPE = Union[_RAW_URL_TYPE, List[_RAW_URL_TYPE], Tuple[_RAW_URL_TYPE, ...]]
+_URL_TYPE = Union[_RAW_URL_TYPE, list[_RAW_URL_TYPE], tuple[_RAW_URL_TYPE, ...]]
 _LoggerType = Union[_Logger, logging.Logger]
 
 RequestFunc = Callable[..., Awaitable[ClientResponse]]
