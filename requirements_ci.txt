@@ -1,4 +1,4 @@
-mypy==1.4.1  # last version that support python 3.7
+mypy==1.19.1  # last version that supports Python 3.9
 pytest-aiohttp==1.0.5
-pytest==7.4.4  # last version that support python 3.7
+pytest==8.4.2 # last version that supports Python 3.9
 ruff==0.7.1
