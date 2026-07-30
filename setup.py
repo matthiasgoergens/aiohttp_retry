@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     packages=find_packages(exclude=["tests", "tests.*"]),
     platforms=["any"],
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
         "aiohttp",
     ],

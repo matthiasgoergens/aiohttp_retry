@@ -2,17 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import sys
+import time
 from abc import abstractmethod
+from collections.abc import Awaitable, Callable, Generator
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Awaitable,
-    Callable,
-    Generator,
-    List,
-    Tuple,
+    Protocol,
     Union,
 )
 
@@ -26,11 +23,6 @@ _MIN_SERVER_ERROR_STATUS = 500
 
 if TYPE_CHECKING:
     from types import TracebackType
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
 
 
 class _Logger(Protocol):
@@ -51,7 +43,7 @@ class _Logger(Protocol):
 
 # url itself or list of urls for changing between retries
 _RAW_URL_TYPE = Union[StrOrURL, YARL_URL]
-_URL_TYPE = Union[_RAW_URL_TYPE, List[_RAW_URL_TYPE], Tuple[_RAW_URL_TYPE, ...]]
+_URL_TYPE = Union[_RAW_URL_TYPE, list[_RAW_URL_TYPE], tuple[_RAW_URL_TYPE, ...]]
 _LoggerType = Union[_Logger, logging.Logger]
 
 RequestFunc = Callable[..., Awaitable[ClientResponse]]
@@ -105,6 +97,7 @@ class _RequestContext:
 
     async def _do_request(self) -> ClientResponse:
         current_attempt = 0
+        start_time = time.monotonic()
 
         while True:
             self._logger.debug(f"Attempt {current_attempt+1} out of {self._retry_options.attempts}")
@@ -135,7 +128,9 @@ class _RequestContext:
                         response.raise_for_status()
                     self._response = response
                     return self._response
-                retry_wait = self._retry_options.get_timeout(attempt=current_attempt, response=response)
+                retry_wait = self._retry_options.get_timeout(
+                    attempt=current_attempt, response=response, start_time=start_time,
+                )
 
             except Exception as e:
                 if current_attempt >= self._retry_options.attempts:
@@ -146,7 +141,9 @@ class _RequestContext:
                     raise
 
                 debug_message = f"Retrying after exception: {e!r}"
-                retry_wait = self._retry_options.get_timeout(attempt=current_attempt, response=None)
+                retry_wait = self._retry_options.get_timeout(
+                    attempt=current_attempt, response=None, start_time=start_time,
+                )
 
             self._logger.debug(debug_message)
             await asyncio.sleep(retry_wait)

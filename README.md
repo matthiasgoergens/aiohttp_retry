@@ -1,6 +1,6 @@
 # Simple aiohttp retry client
 
-Python 3.7 or higher.
+Python 3.9 or higher.
 
 **Install**: `pip install aiohttp-retry`.
 
